@@ -1,6 +1,6 @@
-# 🕌 Quran TikTok Generator — Web App
+# 🕌 Quran Generator — Web App
 
-Interface web pour générer automatiquement des vidéos TikTok coraniques.
+Interface web pour générer automatiquement des vidéos coraniques.
 Accessible depuis n'importe quel appareil (téléphone, tablette, PC).
 
 ---
