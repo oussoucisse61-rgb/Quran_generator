@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🕌 Quran TikTok Generator</title>
+<style>
+  :root {
+    --gold: #e8d5a3;
+    --gold-dark: #c4a96e;
+    --bg: #0a0a0f;
+    --bg2: #12121a;
+    --bg3: #1a1a26;
+    --border: #2a2a3a;
+    --text: #e8e8f0;
+    --muted: #888899;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  /* HEADER */
+  header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 20px; text-align: center; position: relative; }
+  header h1 { font-size: 22px; font-weight: 600; color: var(--gold); letter-spacing: 1px; }
+  header p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .lang-switch { position: absolute; top: 20px; right: 20px; display: flex; gap: 6px; }
+  .lang-btn { padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; transition: all 0.2s; }
+  .lang-btn.active { background: var(--gold); color: #111; border-color: var(--gold); font-weight: 600; }
+
+  /* MAIN */
+  main { max-width: 680px; margin: 0 auto; padding: 24px 16px 80px; }
+
+  /* SECTION */
+  .section { margin-bottom: 24px; }
+  .section-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* RECITER GRID */
+  .reciter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .reciter-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+  .reciter-card:hover { border-color: var(--gold-dark); }
+  .reciter-card.selected { border-color: var(--gold); background: #1e1c10; }
+  .reciter-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--bg3); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; border: 1px solid var(--border); }
+  .reciter-card.selected .reciter-avatar { border-color: var(--gold); background: #2a2510; }
+  .reciter-info { flex: 1; min-width: 0; }
+  .reciter-name { font-size: 12px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .reciter-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .reciter-check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--border); flex-shrink: 0; transition: all 0.2s; }
+  .reciter-card.selected .reciter-check { background: var(--gold); border-color: var(--gold); }
+
+  /* SOURATE SELECT */
+  .sourate-search { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; color: var(--text); font-size: 13px; margin-bottom: 8px; outline: none; }
+  .sourate-search:focus { border-color: var(--gold-dark); }
+  .sourate-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 6px; max-height: 180px; overflow-y: auto; padding-right: 4px; }
+  .sourate-grid::-webkit-scrollbar { width: 4px; }
+  .sourate-grid::-webkit-scrollbar-track { background: var(--bg2); }
+  .sourate-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .sourate-pill { padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg2); color: var(--muted); font-size: 11px; cursor: pointer; transition: all 0.2s; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sourate-pill:hover { border-color: var(--gold-dark); color: var(--text); }
+  .sourate-pill.selected { background: #1e1c10; border-color: var(--gold); color: var(--gold); font-weight: 500; }
+
+  /* DURATION */
+  .duration-row { display: flex; gap: 8px; }
+  .dur-btn { flex: 1; padding: 12px 8px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg2); color: var(--muted); font-size: 12px; cursor: pointer; text-align: center; transition: all 0.2s; }
+  .dur-btn:hover { border-color: var(--gold-dark); }
+  .dur-btn.selected { border-color: var(--gold); color: var(--gold); background: #1e1c10; }
+  .dur-btn .dur-label { font-size: 15px; font-weight: 600; display: block; }
+  .dur-btn .dur-sub { font-size: 9px; margin-top: 2px; }
+
+  /* OPTIONS */
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .opt-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 10px; text-align: center; }
+  .opt-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+  .opt-text { font-size: 10px; color: var(--muted); line-height: 1.3; }
+  .opt-status { font-size: 9px; color: #2a7a4f; margin-top: 3px; font-weight: 500; }
+
+  /* GENERATE BUTTON */
+  .generate-btn { width: 100%; padding: 16px; border-radius: 14px; background: var(--gold); border: none; color: #111; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px; margin-top: 8px; }
+  .generate-btn:hover { background: var(--gold-dark); }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* PROGRESS */
+  .progress-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-top: 20px; display: none; }
+  .progress-box.visible { display: block; }
+  .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .progress-title { font-size: 13px; font-weight: 500; }
+  .progress-pct { font-size: 13px; color: var(--gold); font-weight: 600; }
+  .progress-track { background: var(--bg3); border-radius: 6px; height: 6px; overflow: hidden; }
+  .progress-fill { background: var(--gold); height: 6px; border-radius: 6px; transition: width 0.4s ease; width: 0%; }
+  .progress-msg { font-size: 11px; color: var(--muted); margin-top: 8px; }
+
+  /* VIDEOS */
+  .videos-box { margin-top: 20px; display: none; }
+  .videos-box.visible { display: block; }
+  .videos-title { font-size: 14px; font-weight: 500; color: var(--gold); margin-bottom: 12px; text-align: center; }
+  .video-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .video-label { font-size: 12px; color: var(--text); }
+  .video-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .download-btn { padding: 7px 16px; border-radius: 8px; background: var(--gold); color: #111; border: none; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; text-decoration: none; }
+  .download-btn:hover { background: var(--gold-dark); }
+
+  /* ERROR */
+  .error-box { background: #2a0f0f; border: 1px solid #5a2020; border-radius: 10px; padding: 14px; margin-top: 16px; font-size: 12px; color: #e07070; display: none; }
+  .error-box.visible { display: block; }
+
+  /* FOOTER */
+  footer { text-align: center; padding: 20px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); }
+  footer a { color: var(--gold-dark); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🕌 Quran TikTok Generator</h1>
+  <p class="fr-txt">Créez des vidéos TikTok islamiques en quelques secondes</p>
+  <p class="en-txt" style="display:none">Create beautiful Islamic TikTok videos in seconds</p>
+  <div class="lang-switch">
+    <button class="lang-btn active" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- RÉCITANT -->
+  <div class="section">
+    <div class="section-label">
+      <span class="fr-txt">Récitant</span>
+      <span class="en-txt" style="display:none">Reciter</span>
+    </div>
+    <div class="reciter-grid">
+      {% for id, r in reciters.items() %}
+      <div class="reciter-card {% if id == '1' %}selected{% endif %}" onclick="selectReciter('{{ id }}', this)">
+        <div class="reciter-avatar">🎙️</div>
+        <div class="reciter-info">
+          <div class="reciter-name">{{ r.nom }}</div>
+          <div class="reciter-sub">{{ ['Imam Al-Haram','Koweït','Imam Al-Haram','Arabie Saoudite','Qatar','Arabie Saoudite'][loop.index0] }}</div>
+        </div>
+        <div class="reciter-check"></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- SOURATE -->
+  <div class="section">
+    <div class="section-label">
+      <span class="fr-txt">Sourate</span>
+      <span class="en-txt" style="display:none">Surah</span>
+    </div>
+    <input type="text" class="sourate-search" id="sourate-search"
+      placeholder="🔍 Rechercher une sourate... / Search surah..."
+      oninput="filterSourates(this.value)">
+    <div class="sourate-grid" id="sourate-grid">
+      {% for num, name in sourates.items() %}
+      <div class="sourate-pill {% if num == 1 %}selected{% endif %}"
+           onclick="selectSourate({{ num }}, this)"
+           data-name="{{ name|lower }}">
+        {{ num }}. {{ name }}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- DURÉE -->
+  <div class="section">
+    <div class="section-label">
+      <span class="fr-txt">Durée par vidéo</span>
+      <span class="en-txt" style="display:none">Duration per video</span>
+    </div>
+    <div class="duration-row">
+      <div class="dur-btn" onclick="selectDuration(30, this)">
+        <span class="dur-label">30s</span>
+        <span class="dur-sub fr-txt">Court & viral</span>
+        <span class="dur-sub en-txt" style="display:none">Short & viral</span>
+      </div>
+      <div class="dur-btn selected" onclick="selectDuration(55, this)">
+        <span class="dur-label">55s ✓</span>
+        <span class="dur-sub fr-txt">Recommandé</span>
+        <span class="dur-sub en-txt" style="display:none">Recommended</span>
+      </div>
+      <div class="dur-btn" onclick="selectDuration(90, this)">
+        <span class="dur-label">90s</span>
+        <span class="dur-sub fr-txt">Long format</span>
+        <span class="dur-sub en-txt" style="display:none">Long format</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTIONS (info only) -->
+  <div class="section">
+    <div class="section-label">
+      <span class="fr-txt">Inclus automatiquement</span>
+      <span class="en-txt" style="display:none">Automatically included</span>
+    </div>
+    <div class="options-grid">
+      <div class="opt-card">
+        <span class="opt-icon">📝</span>
+        <div class="opt-text fr-txt">Sous-titres<br>français</div>
+        <div class="opt-text en-txt" style="display:none">French<br>subtitles</div>
+        <div class="opt-status">✓ Actif</div>
+      </div>
+      <div class="opt-card">
+        <span class="opt-icon">✨</span>
+        <div class="opt-text fr-txt">Effets<br>de fondu</div>
+        <div class="opt-text en-txt" style="display:none">Fade<br>effects</div>
+        <div class="opt-status">✓ Actif</div>
+      </div>
+      <div class="opt-card">
+        <span class="opt-icon">📱</span>
+        <div class="opt-text fr-txt">Format<br>TikTok 9:16</div>
+        <div class="opt-text en-txt" style="display:none">TikTok<br>9:16 format</div>
+        <div class="opt-status">✓ 1080×1920</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOUTON GÉNÉRER -->
+  <button class="generate-btn" id="gen-btn" onclick="generate()">
+    <span class="fr-txt">🎬 Générer les vidéos</span>
+    <span class="en-txt" style="display:none">🎬 Generate videos</span>
+  </button>
+
+  <!-- PROGRESS -->
+  <div class="progress-box" id="progress-box">
+    <div class="progress-header">
+      <span class="progress-title fr-txt">Génération en cours...</span>
+      <span class="progress-title en-txt" style="display:none">Processing...</span>
+      <span class="progress-pct" id="pct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="progress-msg" id="progress-msg">Démarrage...</div>
+  </div>
+
+  <!-- ERREUR -->
+  <div class="error-box" id="error-box"></div>
+
+  <!-- VIDÉOS PRÊTES -->
+  <div class="videos-box" id="videos-box">
+    <div class="videos-title fr-txt">🎉 Vos vidéos sont prêtes !</div>
+    <div class="videos-title en-txt" style="display:none">🎉 Your videos are ready!</div>
+    <div id="videos-list"></div>
+  </div>
+
+</main>
+
+<footer>
+  Sources : <a href="https://mp3quran.net" target="_blank">mp3quran.net</a> •
+  <a href="https://alquran.cloud" target="_blank">alquran.cloud</a> •
+  <a href="https://pexels.com" target="_blank">pexels.com</a>
+  — 100% libre de droits 🤲
+</footer>
+
+<script>
+let selectedReciter = '1';
+let selectedSourate = 1;
+let selectedDuration = 55;
+let currentLang = 'fr';
+let pollInterval = null;
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.fr-txt').forEach(e => e.style.display = lang==='fr' ? '' : 'none');
+  document.querySelectorAll('.en-txt').forEach(e => e.style.display = lang==='en' ? '' : 'none');
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function selectReciter(id, el) {
+  selectedReciter = id;
+  document.querySelectorAll('.reciter-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectSourate(num, el) {
+  selectedSourate = num;
+  document.querySelectorAll('.sourate-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectDuration(dur, el) {
+  selectedDuration = dur;
+  document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function filterSourates(query) {
+  const q = query.toLowerCase().trim();
+  document.querySelectorAll('.sourate-pill').forEach(p => {
+    const name = p.dataset.name || '';
+    const num  = p.textContent.split('.')[0].trim();
+    p.style.display = (!q || name.includes(q) || num.includes(q)) ? '' : 'none';
+  });
+}
+
+async function generate() {
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true;
+
+  document.getElementById('progress-box').classList.add('visible');
+  document.getElementById('videos-box').classList.remove('visible');
+  document.getElementById('error-box').classList.remove('visible');
+  document.getElementById('videos-list').innerHTML = '';
+  setProgress(0, currentLang === 'fr' ? 'Démarrage...' : 'Starting...');
+
+  const resp = await fetch('/api/generate', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      recitant: selectedReciter,
+      sourate:  selectedSourate,
+      duration: selectedDuration,
+    })
+  });
+
+  const { job_id, error } = await resp.json();
+  if (error) { showError(error); btn.disabled = false; return; }
+
+  pollInterval = setInterval(() => pollStatus(job_id, btn), 1500);
+}
+
+async function pollStatus(job_id, btn) {
+  try {
+    const resp = await fetch(`/api/status/${job_id}`);
+    const job  = await resp.json();
+
+    setProgress(job.progress, job.message);
+
+    if (job.status === 'done') {
+      clearInterval(pollInterval);
+      btn.disabled = false;
+      showVideos(job.videos);
+    } else if (job.status === 'error') {
+      clearInterval(pollInterval);
+      btn.disabled = false;
+      showError(job.error);
+    }
+  } catch(e) { console.error(e); }
+}
+
+function setProgress(pct, msg) {
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('pct').textContent = pct + '%';
+  document.getElementById('progress-msg').textContent = msg;
+}
+
+function showVideos(videos) {
+  document.getElementById('progress-box').classList.remove('visible');
+  const box  = document.getElementById('videos-box');
+  const list = document.getElementById('videos-list');
+  box.classList.add('visible');
+  list.innerHTML = videos.map(v => `
+    <div class="video-item">
+      <div>
+        <div class="video-label">📹 ${v.label}</div>
+        <div class="video-sub">MP4 • 1080×1920 • TikTok ready</div>
+      </div>
+      <a class="download-btn" href="/api/download/${v.filename}" download>
+        ${currentLang === 'fr' ? '⬇ Télécharger' : '⬇ Download'}
+      </a>
+    </div>
+  `).join('');
+}
+
+function showError(msg) {
+  const box = document.getElementById('error-box');
+  box.textContent = '❌ ' + msg;
+  box.classList.add('visible');
+  document.getElementById('progress-box').classList.remove('visible');
+}
+</script>
+
+</body>
+</html>
